@@ -19,7 +19,7 @@ namespace StringExercises
       // YOUR CODE HERE - START
       string firstName = "Jones";
       string lastName = "Osei";
-      string email = "jones.osei.gmail.com";
+      string email = "jones.dev@gmail.com";
       string phoneNumber = "123-456-7890";
       string address = "1234 Brunswick Street";
 
