@@ -1,4 +1,4 @@
-name: Check C# String Exercises
+name: Check C# String Exercises (Simple)
 
 on:
   push:
@@ -6,11 +6,9 @@ on:
   pull_request:
     branches: [ main ]
 
-# Add permissions for GitHub Pages deployment
+# Minimal permissions - use this if GitHub Pages doesn't work
 permissions:
   contents: read
-  pages: write
-  id-token: write
   pull-requests: write
 
 jobs:
@@ -79,7 +77,7 @@ jobs:
         python3 .github/scripts/test_exercise5.py
       continue-on-error: true
     
-    - name: Generate Interactive HTML Report
+    - name: Generate HTML Report
       run: |
         python3 .github/scripts/generate_html_report.py \
           "${{ steps.exercise1.outcome }}" \
@@ -88,26 +86,11 @@ jobs:
           "${{ steps.exercise4.outcome }}" \
           "${{ steps.exercise5.outcome }}"
     
-    - name: Create report directory
-      run: |
-        mkdir -p ./reports/${{ github.run_number }}
-        cp progress_report.html ./reports/${{ github.run_number }}/
-        cp output*.txt ./reports/${{ github.run_number }}/ 2>/dev/null || true
-    
-    - name: Deploy Report to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v4
-      if: always()
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./reports
-        destination_dir: reports
-        keep_files: true
-    
-    - name: Upload Test Results (Backup)
+    - name: Upload Test Results with HTML Report
       uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: test-results-${{ github.run_number }}
+        name: exercise-results-${{ github.run_number }}
         path: |
           progress_report.html
           progress_report.md
@@ -115,36 +98,25 @@ jobs:
           exercise_status.txt
         retention-days: 30
     
-    - name: Add PR Comment with Report Link
+    - name: Add PR Comment with Download Link
       uses: actions/github-script@v7
       if: github.event_name == 'pull_request' && always()
       with:
         script: |
-          const reportUrl = `https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/reports/${{ github.run_number }}/progress_report.html`;
+          const artifactUrl = `https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}`;
           
-          // Delete old bot comments first
-          const { data: comments } = await github.rest.issues.listComments({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            issue_number: context.issue.number,
-          });
-          
-          for (const comment of comments) {
-            if (comment.user.type === 'Bot' && comment.body.includes('📊 Exercise Progress Report')) {
-              await github.rest.issues.deleteComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                comment_id: comment.id,
-              });
-            }
-          }
-          
-          // Create new comment
           const comment = `## 📊 Exercise Progress Report
           
           Your exercise submission has been automatically tested!
           
-          **📈 [View Interactive Report](${reportUrl})**
+          **📥 [Download Interactive HTML Report](${artifactUrl})**
+          
+          Steps to view your report:
+          1. Click the link above to go to the Actions run
+          2. Scroll down to "Artifacts" section
+          3. Download "exercise-results-${{ github.run_number }}"
+          4. Extract the ZIP file
+          5. Open \`progress_report.html\` in your browser
           
           The report includes:
           - ✅ Overall progress summary with visual progress bar
@@ -154,7 +126,6 @@ jobs:
           - 🎯 Next steps to continue learning
           
           *Report generated on: ${new Date().toLocaleString()} UTC*
-          *Run #${{ github.run_number }}*
           `;
           
           await github.rest.issues.createComment({
@@ -163,18 +134,3 @@ jobs:
             repo: context.repo.repo,
             body: comment
           });
-    
-    - name: Add Workflow Summary
-      if: always()
-      run: |
-        echo "## 📊 Test Results Summary" >> $GITHUB_STEP_SUMMARY
-        echo "" >> $GITHUB_STEP_SUMMARY
-        echo "| Exercise | Status |" >> $GITHUB_STEP_SUMMARY
-        echo "|----------|--------|" >> $GITHUB_STEP_SUMMARY
-        echo "| Exercise 1 | ${{ steps.exercise1.outcome == 'success' && '✅ PASSED' || '❌ FAILED' }} |" >> $GITHUB_STEP_SUMMARY
-        echo "| Exercise 2 | ${{ steps.exercise2.outcome == 'success' && '✅ PASSED' || (steps.exercise1.outcome == 'success' && '❌ FAILED' || '⏭️ SKIPPED') }} |" >> $GITHUB_STEP_SUMMARY
-        echo "| Exercise 3 | ${{ steps.exercise3.outcome == 'success' && '✅ PASSED' || (steps.exercise2.outcome == 'success' && '❌ FAILED' || '⏭️ SKIPPED') }} |" >> $GITHUB_STEP_SUMMARY
-        echo "| Exercise 4 | ${{ steps.exercise4.outcome == 'success' && '✅ PASSED' || (steps.exercise3.outcome == 'success' && '❌ FAILED' || '⏭️ SKIPPED') }} |" >> $GITHUB_STEP_SUMMARY
-        echo "| Exercise 5 | ${{ steps.exercise5.outcome == 'success' && '✅ PASSED' || (steps.exercise4.outcome == 'success' && '❌ FAILED' || '⏭️ SKIPPED') }} |" >> $GITHUB_STEP_SUMMARY
-        echo "" >> $GITHUB_STEP_SUMMARY
-        echo "🌐 **[View Detailed Interactive Report](https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/reports/${{ github.run_number }}/progress_report.html)**" >> $GITHUB_STEP_SUMMARY
