@@ -31,12 +31,12 @@ namespace StringExercises
       // 7. Display each piece of information with a label (e.g., "First Name: John")
 
       // YOUR CODE HERE - START
-      Console.WriteLine("📝 Personal Information:");
-      Console.WriteLine($"First Name: {firstName}");
-      Console.WriteLine($"last Name: {lastName}");
-      Console.WriteLine($"Email Address: {email}");
-      Console.WriteLine($"Phone Number: {phoneNumber}");
-      Console.WriteLine($"Home Address: {address}");
+      Console.WriteLine("Personal Information:");
+      Console.WriteLine("First Name: " + firstName);
+      Console.WriteLine("Last Name: " + lastName);
+      Console.WriteLine("Email: " + email);
+      Console.WriteLine("Phone: " + phoneNumber);
+      Console.WriteLine("Address: " + address);
 
       // YOUR CODE HERE - END
 
