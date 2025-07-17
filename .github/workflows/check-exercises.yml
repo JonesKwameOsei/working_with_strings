@@ -72,22 +72,65 @@ jobs:
         python3 .github/scripts/test_exercise5.py
       continue-on-error: true
     
-    - name: Generate Progress Report
+    - name: Generate Interactive HTML Report
       run: |
-        python3 .github/scripts/generate_report.py \
+        python3 .github/scripts/generate_html_report.py \
           "${{ steps.exercise1.outcome }}" \
           "${{ steps.exercise2.outcome }}" \
           "${{ steps.exercise3.outcome }}" \
           "${{ steps.exercise4.outcome }}" \
           "${{ steps.exercise5.outcome }}"
     
+    - name: Deploy Report to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      if: always()
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: .
+        publish_branch: gh-pages
+        include_files: |
+          progress_report.html
+          output*.txt
+        destination_dir: reports/${{ github.run_number }}
+    
     - name: Upload Test Results
       uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: test-results
+        name: test-results-${{ github.run_number }}
         path: |
-          output*.txt
+          progress_report.html
           progress_report.md
+          output*.txt
           exercise_status.txt
         retention-days: 30
+    
+    - name: Comment PR with Report Link
+      uses: actions/github-script@v7
+      if: github.event_name == 'pull_request' && always()
+      with:
+        script: |
+          const reportUrl = `https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/reports/${{ github.run_number }}/progress_report.html`;
+          
+          const comment = `## 📊 Exercise Progress Report
+          
+          Your exercise submission has been automatically tested!
+          
+          **📈 [View Interactive Report](${reportUrl})**
+          
+          The report includes:
+          - ✅ Overall progress summary
+          - 🔍 Detailed test results for each exercise
+          - 💡 Specific suggestions to fix issues
+          - 📝 Your program output and source code
+          - 🎯 Next steps to continue learning
+          
+          *Report generated on: ${new Date().toLocaleString()}*
+          `;
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: comment
+          });
