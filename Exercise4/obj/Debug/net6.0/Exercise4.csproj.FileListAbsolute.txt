@@ -1,0 +1,14 @@
+C:\Users\JonesPC\OneDrive\MyStudyFolder\Jomacs-FS\Backend\small-meet-ups\01-strings\Exercise4\bin\Debug\net6.0\Exercise4.exe
+C:\Users\JonesPC\OneDrive\MyStudyFolder\Jomacs-FS\Backend\small-meet-ups\01-strings\Exercise4\bin\Debug\net6.0\Exercise4.deps.json
+C:\Users\JonesPC\OneDrive\MyStudyFolder\Jomacs-FS\Backend\small-meet-ups\01-strings\Exercise4\bin\Debug\net6.0\Exercise4.runtimeconfig.json
+C:\Users\JonesPC\OneDrive\MyStudyFolder\Jomacs-FS\Backend\small-meet-ups\01-strings\Exercise4\bin\Debug\net6.0\Exercise4.dll
+C:\Users\JonesPC\OneDrive\MyStudyFolder\Jomacs-FS\Backend\small-meet-ups\01-strings\Exercise4\bin\Debug\net6.0\Exercise4.pdb
+C:\Users\JonesPC\OneDrive\MyStudyFolder\Jomacs-FS\Backend\small-meet-ups\01-strings\Exercise4\obj\Debug\net6.0\Exercise4.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\JonesPC\OneDrive\MyStudyFolder\Jomacs-FS\Backend\small-meet-ups\01-strings\Exercise4\obj\Debug\net6.0\Exercise4.AssemblyInfoInputs.cache
+C:\Users\JonesPC\OneDrive\MyStudyFolder\Jomacs-FS\Backend\small-meet-ups\01-strings\Exercise4\obj\Debug\net6.0\Exercise4.AssemblyInfo.cs
+C:\Users\JonesPC\OneDrive\MyStudyFolder\Jomacs-FS\Backend\small-meet-ups\01-strings\Exercise4\obj\Debug\net6.0\Exercise4.csproj.CoreCompileInputs.cache
+C:\Users\JonesPC\OneDrive\MyStudyFolder\Jomacs-FS\Backend\small-meet-ups\01-strings\Exercise4\obj\Debug\net6.0\Exercise4.dll
+C:\Users\JonesPC\OneDrive\MyStudyFolder\Jomacs-FS\Backend\small-meet-ups\01-strings\Exercise4\obj\Debug\net6.0\refint\Exercise4.dll
+C:\Users\JonesPC\OneDrive\MyStudyFolder\Jomacs-FS\Backend\small-meet-ups\01-strings\Exercise4\obj\Debug\net6.0\Exercise4.pdb
+C:\Users\JonesPC\OneDrive\MyStudyFolder\Jomacs-FS\Backend\small-meet-ups\01-strings\Exercise4\obj\Debug\net6.0\Exercise4.genruntimeconfig.cache
+C:\Users\JonesPC\OneDrive\MyStudyFolder\Jomacs-FS\Backend\small-meet-ups\01-strings\Exercise4\obj\Debug\net6.0\ref\Exercise4.dll
