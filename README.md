@@ -26,7 +26,8 @@ Instead of downloading files, you now get **instant web-based reports** with:
 
 ### 🌐 **Begin your Exercise Here:**
 
-**<https://joneskwameosei.github.io/working_with_strings/>**
+**<https://joneskwameosei.github.io/working_with_strings/>** then click 🖱️
+"Start Exercises" to fork and clone the repository.
 
 ## 📚 Exercise Overview
 
@@ -345,6 +346,11 @@ carefully, and don't hesitate to ask for help when needed._
 - 🎨 **Beautiful Interface**: Professional, engaging design
 - 📊 **Visual Progress**: See your advancement with progress bars
 - 🚀 **No Downloads**: Everything works directly in your browser
+
+> **Note**: You can refresh the C# basics with `Working_with_Strings.ipynb`, a
+> **Jupyter Notebook** file in which you can practice and test your knowledge.
+
+**🌟 Try it now!**
 
 **Transform your learning experience - push your code and see the magic
 happen!** ✨
