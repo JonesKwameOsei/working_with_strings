@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 permissions:
-  contents: write  # This should be enough for most repositories
+  contents: write
   pull-requests: write
   actions: write
 
@@ -19,6 +19,7 @@ jobs:
     - uses: actions/checkout@v4
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
+        fetch-depth: 0  # Fetch all history for proper branch management
     
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
@@ -88,91 +89,139 @@ jobs:
           "${{ steps.exercise4.outcome }}" \
           "${{ steps.exercise5.outcome }}"
     
-    - name: Prepare deployment files
-      run: |
-        # Create the reports directory structure
-        mkdir -p docs/reports/${{ github.run_number }}
-        
-        # Copy the HTML report
-        cp progress_report.html docs/reports/${{ github.run_number }}/
-        
-        # Copy output files if they exist
-        cp output*.txt docs/reports/${{ github.run_number }}/ 2>/dev/null || true
-        
-        # Create an index.html that redirects to the latest report
-        cat > docs/index.html << 'HTML'
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>C# String Exercises Reports</title>
-    <meta http-equiv="refresh" content="0; url=reports/${{ github.run_number }}/progress_report.html">
-    <style>
-        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
-        .container { max-width: 600px; margin: 0 auto; }
-        .btn { display: inline-block; padding: 15px 30px; background: #007bff; color: white; text-decoration: none; border-radius: 5px; margin: 10px; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>🎓 C# String Exercises</h1>
-        <p>Redirecting to the latest progress report...</p>
-        <p>If you are not redirected automatically:</p>
-        <a href="reports/${{ github.run_number }}/progress_report.html" class="btn">View Latest Report</a>
-    </div>
-</body>
-</html>
-HTML
-        
-        # Create a reports index
-        cat > docs/reports/index.html << 'HTML'
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>All Reports - C# String Exercises</title>
-    <style>
-        body { font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: 0 auto; }
-        .report-link { display: block; padding: 15px; margin: 10px 0; background: #f8f9fa; border-radius: 5px; text-decoration: none; color: #333; }
-        .report-link:hover { background: #e9ecef; }
-    </style>
-</head>
-<body>
-    <h1>📊 All Exercise Reports</h1>
-    <p>Here are all the generated reports:</p>
-    <a href="${{ github.run_number }}/progress_report.html" class="report-link">
-        📈 Run #${{ github.run_number }} - Latest Report
-    </a>
-</body>
-</html>
-HTML
-    
-    - name: Commit and push to gh-pages
+    - name: Setup gh-pages branch and deploy
       run: |
         # Configure git
         git config --global user.name 'github-actions[bot]'
         git config --global user.email 'github-actions[bot]@users.noreply.github.com'
         
-        # Create or switch to gh-pages branch
-        git checkout -B gh-pages
+        # Create a temporary directory for our site
+        mkdir -p temp-site/reports/${{ github.run_number }}
         
-        # Remove everything except docs folder
-        find . -maxdepth 1 -not -name 'docs' -not -name '.git' -not -name '.' -exec rm -rf {} + 2>/dev/null || true
+        # Copy the HTML report and outputs
+        cp progress_report.html temp-site/reports/${{ github.run_number }}/
+        cp output*.txt temp-site/reports/${{ github.run_number }}/ 2>/dev/null || true
         
-        # Move docs contents to root
-        if [ -d "docs" ]; then
-          mv docs/* . 2>/dev/null || true
-          rmdir docs 2>/dev/null || true
+        # Create the main index.html that redirects to the latest report
+        cat > temp-site/index.html << 'HTML'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C# String Exercises - Latest Report</title>
+    <meta http-equiv="refresh" content="3; url=reports/${{ github.run_number }}/progress_report.html">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            padding: 50px 20px;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            max-width: 600px;
+            background: rgba(255,255,255,0.1);
+            padding: 40px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            margin: 20px 10px;
+            border: 2px solid rgba(255,255,255,0.3);
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+        .btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        .meta {
+            margin-top: 30px;
+            opacity: 0.8;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎓 C# String Exercises</h1>
+        <h2>Progress Report</h2>
+        <div class="spinner"></div>
+        <p>Redirecting to your latest exercise report...</p>
+        <p><strong>Run #${{ github.run_number }}</strong></p>
+        
+        <div>
+            <a href="reports/${{ github.run_number }}/progress_report.html" class="btn">📊 View Report</a>
+            <a href="https://github.com/${{ github.repository }}" class="btn">📚 Back to Exercises</a>
+        </div>
+        
+        <div class="meta">
+            <p>Generated on: $(date)</p>
+            <p>If you're not redirected automatically, click "View Report" above.</p>
+        </div>
+    </div>
+</body>
+</html>
+HTML
+        
+        # Switch to gh-pages branch (create if doesn't exist)
+        if git show-ref --verify --quiet refs/heads/gh-pages; then
+            git checkout gh-pages
+            # Remove old files but keep the reports directory structure
+            find . -maxdepth 1 -not -name 'reports' -not -name '.git' -not -name '.' -not -name 'temp-site' -exec rm -rf {} + 2>/dev/null || true
+        else
+            git checkout --orphan gh-pages
+            # Remove all files from the new orphan branch
+            git rm -rf . 2>/dev/null || true
         fi
         
-        # Add and commit
+        # Copy new files from temp directory
+        cp -r temp-site/* . 2>/dev/null || true
+        rm -rf temp-site
+        
+        # Ensure we have an index.html
+        if [ ! -f "index.html" ]; then
+            echo "<!DOCTYPE html><html><head><title>C# String Exercises</title></head><body><h1>C# String Exercises</h1><p>Reports will appear here after running exercises.</p></body></html>" > index.html
+        fi
+        
+        # Add all files and commit
         git add .
-        git commit -m "Deploy reports for run #${{ github.run_number }}" || echo "No changes to commit"
+        git commit -m "Deploy exercise reports for run #${{ github.run_number }}" || echo "No changes to commit"
         
         # Push to gh-pages
         git push origin gh-pages --force
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     
     - name: Upload Test Results (Backup)
       uses: actions/upload-artifact@v4
@@ -192,6 +241,7 @@ HTML
       with:
         script: |
           const reportUrl = `https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/reports/${{ github.run_number }}/progress_report.html`;
+          const mainUrl = `https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/`;
           
           const comment = `## 📊 Exercise Progress Report
           
@@ -200,8 +250,8 @@ HTML
           **📈 [View Interactive Report](${reportUrl})**
           
           Alternative access:
-          - 🌐 [All Reports](https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/)
-          - 📥 Download from [Artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          - 🌐 [Main Reports Page](${mainUrl})
+          - 📥 [Download Backup](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
           
           The report includes:
           - ✅ Overall progress summary with visual progress bar
@@ -235,5 +285,7 @@ HTML
         echo "| Exercise 5 | ${{ steps.exercise5.outcome == 'success' && '✅ PASSED' || (steps.exercise4.outcome == 'success' && '❌ FAILED' || '⏭️ SKIPPED') }} |" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "🌐 **[View Detailed Interactive Report](https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/reports/${{ github.run_number }}/progress_report.html)**" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "🏠 **[Main Reports Page](https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/)**" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "📥 **[Download Backup](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})**" >> $GITHUB_STEP_SUMMARY

@@ -53,3 +53,4 @@ deploy_html_reports.sh
 complete_html_implementation.sh
 GITHUB_PAGES_SETUP.md
 fix_deployment_issues.sh
+scripts/*
