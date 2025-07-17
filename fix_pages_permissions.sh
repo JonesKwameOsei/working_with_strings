@@ -1,3 +1,18 @@
+#!/bin/bash
+
+echo "🔧 Fixing GitHub Pages permissions and configuration..."
+
+# The issue is that we need to enable the right permissions in repository settings
+# Let's create a simplified approach that works with default GitHub permissions
+
+echo "📋 Current Issues Identified:"
+echo "   ❌ GitHub Actions bot doesn't have push permissions to gh-pages branch"
+echo "   ❌ Repository settings may not allow Actions to create branches"
+echo "   ❌ GitHub Pages is showing README.md instead of our reports"
+echo ""
+
+# Create a simplified workflow that doesn't need special permissions
+cat > .github/workflows/check-exercises.yml << 'EOF'
 name: Check C# String Exercises
 
 on:
@@ -237,3 +252,84 @@ HTML
         echo "🌐 **[View Detailed Interactive Report](https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/reports/${{ github.run_number }}/progress_report.html)**" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "📥 **[Download Backup](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})**" >> $GITHUB_STEP_SUMMARY
+EOF
+
+echo "✅ Created new workflow that handles GitHub Pages deployment manually"
+
+# Create instructions for repository settings
+cat > REPOSITORY_SETTINGS.md << 'EOF'
+# Repository Settings for GitHub Actions and Pages
+
+## 1. Enable GitHub Actions Permissions
+
+Go to your repository Settings → Actions → General:
+
+### Workflow Permissions:
+- ✅ **Read and write permissions** 
+- ✅ **Allow GitHub Actions to create and approve pull requests**
+
+## 2. Configure GitHub Pages
+
+Go to your repository Settings → Pages:
+
+### Source:
+- ✅ **Deploy from a branch**
+- ✅ **Branch: gh-pages**
+- ✅ **Folder: / (root)**
+
+## 3. Branch Protection (Optional)
+
+If you want to prevent direct pushes to main:
+- Go to Settings → Branches
+- Add rule for `main` branch
+- ✅ **Require pull request reviews before merging**
+
+## 4. Verify Setup
+
+After making these changes:
+1. Push a new commit to trigger the workflow
+2. Check Actions tab for successful runs
+3. Visit your GitHub Pages URL:
+   ```
+   https://YOUR_USERNAME.github.io/YOUR_REPOSITORY_NAME
+   ```
+
+## 5. Troubleshooting
+
+### If deployment still fails:
+1. Check that "Read and write permissions" is enabled
+2. Verify the gh-pages branch exists
+3. Check that GitHub Pages source is set to gh-pages branch
+4. Wait 5-10 minutes for Pages to update
+
+### If Pages shows README instead of reports:
+1. The workflow creates an index.html that redirects to reports
+2. Clear your browser cache
+3. Try visiting the direct report URL
+EOF
+
+echo "✅ Created repository settings instructions"
+
+echo ""
+echo "🔧 What This Fix Does:"
+echo "   ✅ Uses manual git operations instead of peaceiris/actions-gh-pages"
+echo "   ✅ Creates proper directory structure for GitHub Pages"
+echo "   ✅ Adds automatic redirection from root to latest report"
+echo "   ✅ Provides both direct links and backup downloads"
+echo "   ✅ Handles permissions more reliably"
+echo ""
+echo "📋 Next Steps:"
+echo "   1. Apply this fix: git add . && git commit -m 'Fix Pages deployment' && git push"
+echo "   2. Go to repository Settings → Actions → General"
+echo "   3. Enable 'Read and write permissions' for GitHub Actions"
+echo "   4. Go to Settings → Pages and set source to 'gh-pages' branch"
+echo "   5. Test by pushing a change"
+echo ""
+echo "🌐 After setup, reports will be available at:"
+echo "   https://YOUR_USERNAME.github.io/YOUR_REPOSITORY_NAME/"
+echo ""
+echo "✅ This approach should work with any repository permissions!"
+
+EOF
+
+chmod +x fix_pages_permissions.sh

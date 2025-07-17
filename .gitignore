@@ -49,3 +49,7 @@ Desktop.ini
 add_remaining_files.sh
 github_repo_setup.sh
 fix_github_actions.sh
+deploy_html_reports.sh
+complete_html_implementation.sh
+GITHUB_PAGES_SETUP.md
+fix_deployment_issues.sh
