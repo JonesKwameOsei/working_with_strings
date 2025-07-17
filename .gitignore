@@ -48,3 +48,4 @@ Desktop.ini
 # Setup files
 add_remaining_files.sh
 github_repo_setup.sh
+fix_github_actions.sh
